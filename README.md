@@ -1,6 +1,8 @@
-# 💘 Will You Be My Valentine?
+# 💘 Be My Val
 
 An interactive, over-engineered Valentine's Day website where the **No button literally runs away from your cursor** for 8 attempts before finally giving in.
+
+🌐 **Live**: [bemyval.vercel.app](https://bemyval.vercel.app)
 
 ## ✨ Features
 

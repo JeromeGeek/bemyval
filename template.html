@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+  <title>Will You Be My Valentine? 💕</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Fira+Code:wght@400;600&family=Playfair+Display:wght@600;800&family=Inter:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ─── THEME VARS ────────────────────────────────────── */
+    :root{
+      --bg:linear-gradient(135deg,#fce4ec 0%,#f8bbd0 40%,#f48fb1 100%);
+      --bg2:#fce4ec;
+      --tx:#880e4f; --tx2:#ad1457;
+      --card:rgba(255,255,255,0.85); --cb:rgba(233,30,99,0.18);
+      --ybg:linear-gradient(135deg,#e91e63,#c2185b); --ygl:rgba(233,30,99,0.35);
+      --nbg:linear-gradient(135deg,#90a4ae,#78909c); --nc:#fff;
+      --tip:rgba(136,14,79,0.92); --tipc:#fff;
+      --heart:#e91e63; --R:22px;
+      --font:'Quicksand',sans-serif;
+      --conf:#e91e63,#f06292,#ff80ab,#f48fb1,#ec407a,#ff1744;
+    }
+
+    [data-theme="terminal"]{
+      --bg:linear-gradient(160deg,#020a02,#0a180a); --bg2:#020a02;
+      --tx:#00ff41; --tx2:#00cc33;
+      --card:rgba(0,12,0,0.92); --cb:rgba(0,255,65,0.15);
+      --ybg:linear-gradient(135deg,#00ff41,#00cc33); --ygl:rgba(0,255,65,0.25);
+      --nbg:linear-gradient(135deg,#2a0000,#440000); --nc:#ff4444;
+      --tip:rgba(0,16,0,0.97); --tipc:#00ff41;
+      --heart:#00ff41; --R:2px;
+      --font:'Fira Code',monospace;
+      --conf:#00ff41,#00cc33,#33ff66,#66ff99;
+    }
+
+    [data-theme="cinematic"]{
+      --bg:radial-gradient(ellipse at 50% 35%,#1a1a2e,#08081a); --bg2:#08081a;
+      --tx:#e0d0ff; --tx2:#b8a0e0;
+      --card:rgba(16,10,36,0.84); --cb:rgba(180,140,255,0.15);
+      --ybg:linear-gradient(135deg,#9c27b0,#7b1fa2); --ygl:rgba(156,39,176,0.3);
+      --nbg:linear-gradient(135deg,#37474f,#263238); --nc:#b0bec5;
+      --tip:rgba(24,14,50,0.97); --tipc:#e0d0ff;
+      --heart:#ce93d8; --R:14px;
+      --font:'Playfair Display',Georgia,serif;
+      --conf:#ce93d8,#ab47bc,#9c27b0,#e1bee7,#ea80fc;
+    }
+
+    [data-theme="arcade"]{
+      --bg:linear-gradient(180deg,#0f0c29,#302b63,#24243e); --bg2:#0f0c29;
+      --tx:#ffeb3b; --tx2:#ffc107;
+      --card:rgba(15,12,41,0.93); --cb:rgba(255,235,59,0.2);
+      --ybg:linear-gradient(135deg,#76ff03,#64dd17); --ygl:rgba(118,255,3,0.3);
+      --nbg:linear-gradient(135deg,#d50000,#b71c1c); --nc:#fff;
+      --tip:rgba(15,12,41,0.97); --tipc:#ffeb3b;
+      --heart:#ff1744; --R:0px;
+      --font:'"Press Start 2P"',monospace;
+      --conf:#ffeb3b,#76ff03,#ff1744,#2979ff,#e040fb;
+    }
+
+    /* ─── GLOBAL ────────────────────────────────────────── */
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+    html,body{
+      width:100%;height:100%;overflow:hidden;
+      font-family:var(--font);
+      background:var(--bg);color:var(--tx);
+      transition:background .8s,color .4s,font-family 0s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    body{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+
+    /* ─── CUSTOM CURSORS PER THEME ──────────────────────── */
+    /* Classic: heart cursor */
+    [data-theme="classic"],[data-theme="classic"] *{
+      cursor:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><text y='22' font-size='22'>💖</text></svg>") 14 14,auto;
+    }
+    /* Terminal: green pointer/crosshair */
+    [data-theme="terminal"],[data-theme="terminal"] *{
+      cursor:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><text y='18' font-size='18'>▮</text></svg>") 12 12,crosshair;
+    }
+    /* Cinematic: spotlight/star */
+    [data-theme="cinematic"],[data-theme="cinematic"] *{
+      cursor:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><text y='22' font-size='22'>✨</text></svg>") 14 14,auto;
+    }
+    /* Arcade: crosshair/target */
+    [data-theme="arcade"],[data-theme="arcade"] *{
+      cursor:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><text y='22' font-size='22'>🎯</text></svg>") 14 14,crosshair;
+    }
+
+    #bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+    /* ─── SPOTLIGHT (cinematic) ──────────────────────────── */
+    #spotCanvas{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .6s}
+    [data-theme="cinematic"] #spotCanvas{opacity:1}
+    .ht{position:fixed;font-size:clamp(11px,1.8vw,18px);color:transparent;pointer-events:none;z-index:1;font-style:italic;white-space:nowrap}
+
+    /* ─── SCANLINES ─────────────────────────────────────── */
+    [data-theme="terminal"]::after,[data-theme="arcade"]::after{
+      content:"";position:fixed;inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 4px);
+      pointer-events:none;z-index:998;
+    }
+    [data-theme="terminal"]{animation:flk .08s infinite alternate}
+    @keyframes flk{0%{opacity:.985}100%{opacity:1}}
+
+    /* ─── CLASSIC MODE: floating hearts glow ────────────── */
+    [data-theme="classic"] body::before{
+      content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:radial-gradient(ellipse at 50% 60%,rgba(233,30,99,.06) 0%,transparent 70%);
+    }
+
+    /* ─── THEME BAR ─────────────────────────────────────── */
+    .tbar{
+      position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;
+      display:flex;gap:clamp(2px,0.8vw,4px);flex-wrap:wrap;justify-content:center;
+      background:var(--card);backdrop-filter:blur(14px);
+      border:1px solid var(--cb);border-radius:14px;padding:clamp(3px,0.8vw,4px) clamp(4px,1vw,6px);
+      box-shadow:0 4px 30px rgba(0,0,0,.06);max-width:96vw;
+      transition:background .4s,border-color .4s;
+    }
+    .tp{
+      padding:clamp(4px,1.2vw,7px) clamp(8px,2vw,14px);border:none;border-radius:10px;cursor:pointer;
+      font-size:clamp(9px,2.2vw,12px);font-weight:600;color:var(--tx);background:transparent;
+      transition:all .3s;font-family:inherit;white-space:nowrap;
+    }
+    .tp.on{background:var(--ybg);color:#fff;box-shadow:0 2px 14px var(--ygl)}
+    .tp:hover:not(.on){background:rgba(128,128,128,.12)}
+
+    /* ─── CARD ──────────────────────────────────────────── */
+    .card{
+      position:relative;z-index:10;text-align:center;
+      padding:clamp(22px,5vw,40px) clamp(16px,5vw,36px) clamp(20px,4.5vw,36px);
+      border-radius:var(--R);
+      background:var(--card);backdrop-filter:blur(18px);
+      border:1px solid var(--cb);
+      box-shadow:0 8px 48px rgba(0,0,0,.06);
+      max-width:min(480px,90vw);width:90vw;
+      transition:background .4s,border-color .4s,border-radius .4s,box-shadow .4s;
+      overflow:visible;
+    }
+
+    .cem{font-size:clamp(32px,10vw,52px);margin-bottom:clamp(4px,1.5vw,8px);line-height:1.2}
+    .card h1{
+      font-size:clamp(20px,5vw,32px);line-height:1.4;margin-bottom:6px;
+      word-wrap:break-word;
+    }
+    /* Classic mode: romantic script for the heading */
+    [data-theme="classic"] .card h1{
+      font-family:'Dancing Script','Quicksand',cursive;
+      font-size:clamp(24px,6vw,42px);font-weight:700;
+      background:linear-gradient(135deg,#c2185b,#e91e63,#f06292);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+      filter:drop-shadow(0 2px 8px rgba(233,30,99,.15));
+    }
+    .card .sub{font-size:clamp(10px,2.8vw,15px);color:var(--tx2);margin-bottom:clamp(16px,4vw,28px);opacity:.85}
+    [data-theme="classic"] .card .sub{font-family:'Quicksand',sans-serif;font-weight:500;letter-spacing:.3px}
+
+    /* Classic card: soft glow */
+    [data-theme="classic"] .card{
+      box-shadow:0 8px 48px rgba(233,30,99,.06),0 0 120px rgba(233,30,99,.04);
+    }
+
+    /* Terminal card */
+    [data-theme="terminal"] .card{
+      box-shadow:0 0 50px rgba(0,255,65,.03),inset 0 0 100px rgba(0,255,65,.01);
+      border-color:rgba(0,255,65,.2);
+    }
+    [data-theme="terminal"] .card::before{
+      content:"┌─── valentine.sh ───┐";display:block;
+      font-size:10px;opacity:.35;margin-bottom:12px;letter-spacing:1px;
+    }
+    [data-theme="terminal"] .card::after{
+      content:"└────────────────────┘";display:block;
+      font-size:10px;opacity:.35;margin-top:14px;letter-spacing:1px;
+    }
+    [data-theme="terminal"] .card h1::before{content:"> ";opacity:.4}
+    [data-theme="terminal"] .card .sub::before{content:"$ ";opacity:.4}
+    [data-theme="terminal"] .card h1::after{
+      content:"█";animation:blink 1s step-end infinite;opacity:.6;margin-left:2px;
+    }
+    @keyframes blink{0%,100%{opacity:.6}50%{opacity:0}}
+
+    /* Cinematic card */
+    [data-theme="cinematic"] .card{
+      box-shadow:0 0 60px rgba(156,39,176,.06),0 20px 60px rgba(0,0,0,.15);
+    }
+
+    /* Arcade card */
+    [data-theme="arcade"] .card{
+      border:2px solid rgba(255,235,59,.3);
+      box-shadow:0 0 25px rgba(255,235,59,.05),0 0 80px rgba(255,235,59,.02);
+      image-rendering:pixelated;
+    }
+    [data-theme="arcade"] .card h1{text-transform:uppercase;letter-spacing:2px;font-size:clamp(11px,3vw,18px)}
+    [data-theme="arcade"] .card .sub{font-size:clamp(8px,2vw,11px);letter-spacing:1px}
+    [data-theme="arcade"] .card::before{
+      content:"══════════════════════";display:block;
+      font-size:10px;opacity:.25;margin-bottom:10px;text-align:center;letter-spacing:2px;
+    }
+    [data-theme="arcade"] .card::after{
+      content:"══════════════════════";display:block;
+      font-size:10px;opacity:.25;margin-top:10px;text-align:center;letter-spacing:2px;
+    }
+
+    /* ─── BUTTONS ───────────────────────────────────────── */
+    .br{display:flex;gap:clamp(10px,3vw,16px);justify-content:center;align-items:center;flex-wrap:wrap;min-height:48px;width:100%}
+
+    .btn{
+      padding:clamp(10px,2.5vw,13px) clamp(22px,6vw,34px);border:none;border-radius:var(--R);
+      font-size:clamp(13px,3.5vw,16px);font-weight:700;cursor:pointer;
+      transition:all .3s cubic-bezier(.4,0,.2,1);
+      font-family:inherit;letter-spacing:.3px;outline:none;
+      max-width:45vw;white-space:nowrap;
+    }
+
+    .by{background:var(--ybg);color:#fff;box-shadow:0 4px 22px var(--ygl);z-index:20}
+    .by:hover{transform:scale(1.08);box-shadow:0 6px 32px var(--ygl)}
+    .by{animation:yPulse 2s ease-in-out infinite}
+    @keyframes yPulse{
+      0%,100%{box-shadow:0 4px 22px var(--ygl)}
+      50%{box-shadow:0 4px 36px var(--ygl),0 0 60px var(--ygl)}
+    }
+    /* Classic Yes extra love */
+    [data-theme="classic"] .by{font-family:'Quicksand',sans-serif;font-weight:700;font-size:17px;letter-spacing:.5px}
+
+    .bn{background:var(--nbg);color:var(--nc);box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:15}
+    .bn.ev{position:fixed;z-index:50;transition:none;max-width:none}
+    [data-theme="classic"] .bn{font-family:'Quicksand',sans-serif;font-weight:600}
+
+    [data-theme="terminal"] .btn{font-family:'Fira Code',monospace;border-radius:2px}
+    [data-theme="terminal"] .bn{border:1px solid #ff4444}
+    [data-theme="terminal"] .bn::before{content:"✗ "}
+    [data-theme="terminal"] .by::before{content:"✓ "}
+
+    [data-theme="arcade"] .btn{
+      font-family:'"Press Start 2P"',monospace;
+      border-radius:0;text-transform:uppercase;letter-spacing:1px;
+      border:2px solid currentColor;font-size:11px;padding:13px 22px;
+    }
+
+    /* ─── TOOLTIPS ──────────────────────────────────────── */
+    .tip{
+      position:fixed;z-index:60;padding:10px 18px;border-radius:10px;
+      background:var(--tip);color:var(--tipc);
+      font-size:13px;font-weight:600;pointer-events:none;white-space:nowrap;
+      box-shadow:0 6px 28px rgba(0,0,0,.22);backdrop-filter:blur(10px);
+      max-width:92vw;overflow:hidden;text-overflow:ellipsis;
+    }
+    .tip::after{
+      content:"";position:absolute;bottom:-5px;left:50%;
+      width:10px;height:10px;background:var(--tip);
+      transform:translateX(-50%) rotate(45deg);
+    }
+    [data-theme="classic"] .tip{font-family:'Quicksand',sans-serif}
+    [data-theme="terminal"] .tip{border:1px solid rgba(0,255,65,.3);border-radius:0;font-family:'Fira Code',monospace}
+    [data-theme="terminal"] .tip::before{content:"» ";opacity:.4}
+    [data-theme="arcade"] .tip{border:2px solid var(--tx);border-radius:0;font-family:'"Press Start 2P"',monospace;font-size:8px;letter-spacing:.5px;padding:10px 14px}
+    [data-theme="cinematic"] .tip{
+      border:1px solid rgba(156,39,176,.3);
+      box-shadow:0 6px 28px rgba(0,0,0,.3),0 0 20px rgba(156,39,176,.1);
+    }
+
+    /* ─── PROGRESS ──────────────────────────────────────── */
+    .prog{position:fixed;bottom:clamp(10px,2.5vw,16px);left:50%;transform:translateX(-50%);z-index:100;text-align:center}
+    .plab{font-size:clamp(8px,2vw,11px);color:var(--tx2);opacity:.6;margin-bottom:5px}
+    [data-theme="terminal"] .plab::before{content:"[LOG] "}
+    [data-theme="arcade"] .plab{text-transform:uppercase;letter-spacing:1px;font-size:clamp(6px,1.5vw,7px)}
+    .ptr{width:clamp(110px,40vw,180px);height:4px;background:rgba(128,128,128,.15);border-radius:3px;overflow:hidden;margin:0 auto}
+    .pfl{height:100%;width:0%;background:var(--ybg);border-radius:3px;transition:width .4s}
+
+    /* ─── FINAL SCREEN ──────────────────────────────────── */
+    .fin{
+      position:fixed;inset:0;z-index:200;
+      display:none;flex-direction:column;align-items:center;justify-content:center;
+      background:var(--bg);opacity:0;padding:20px;
+    }
+    .fin.show{display:flex}
+    #hBox{width:clamp(120px,35vw,200px);height:clamp(120px,35vw,200px)}
+    .fm{margin-top:14px;font-size:clamp(16px,5vw,36px);font-weight:700;text-align:center;padding:0 20px}
+    [data-theme="classic"] .fm{font-family:'Dancing Script',cursive}
+    .fs{margin-top:8px;font-size:clamp(11px,2.8vw,18px);color:var(--tx2);opacity:.85;text-align:center;padding:0 20px}
+    .fst{
+      margin-top:16px;padding:clamp(8px,2vw,10px) clamp(14px,3vw,22px);border-radius:var(--R);
+      background:rgba(128,128,128,.07);border:1px solid var(--cb);
+      font-size:clamp(10px,2.5vw,12px);color:var(--tx2);text-align:center;line-height:1.7;
+      max-width:90vw;
+    }
+
+    /* ─── TABLET / SMALL DESKTOP ────────────────────────── */
+    @media(max-width:768px){
+      .card{padding:30px 24px 28px;max-width:88vw}
+      .btn{padding:12px 28px;font-size:15px}
+      .cem{font-size:44px}
+      .br{gap:12px}
+    }
+
+    /* ─── MOBILE ────────────────────────────────────────── */
+    @media(max-width:540px){
+      .tbar{top:6px;padding:3px;gap:2px;border-radius:10px}
+      .tp{padding:5px 8px;font-size:9.5px}
+      .card{padding:22px 14px 20px;max-width:92vw;border-radius:16px}
+      .cem{font-size:36px;margin-bottom:4px}
+      .card h1{font-size:clamp(16px,4.5vw,24px)!important;margin-bottom:4px}
+      [data-theme="classic"] .card h1{font-size:clamp(20px,5.5vw,32px)!important}
+      .card .sub{font-size:clamp(10px,2.6vw,13px);margin-bottom:18px}
+      .br{gap:10px;min-height:44px}
+      .btn{padding:10px 22px;font-size:13px;border-radius:12px}
+      .by{font-size:13px!important}
+      [data-theme="arcade"] .btn{font-size:8px;padding:10px 14px;letter-spacing:.5px}
+      [data-theme="terminal"] .card::before,
+      [data-theme="terminal"] .card::after{font-size:8px}
+      [data-theme="arcade"] .card::before,
+      [data-theme="arcade"] .card::after{font-size:8px;letter-spacing:1px}
+      .ptr{width:130px;height:3px}
+      .plab{font-size:9px}
+      [data-theme="arcade"] .plab{font-size:6px}
+      .tip{font-size:11px;padding:8px 14px;max-width:88vw}
+      [data-theme="arcade"] .tip{font-size:7px;padding:8px 10px}
+      .fm{font-size:clamp(16px,4.5vw,28px)!important}
+      .fs{font-size:clamp(11px,2.6vw,15px)!important}
+      .fst{font-size:10px;padding:8px 14px}
+      #hBox{width:150px;height:150px}
+      .prog{bottom:10px}
+    }
+
+    /* ─── VERY SMALL MOBILE (≤380px) ────────────────────── */
+    @media(max-width:380px){
+      .tbar{gap:1px;padding:2px;border-radius:8px}
+      .tp{padding:4px 6px;font-size:8px}
+      .card{padding:18px 12px 16px;max-width:95vw;border-radius:14px}
+      .cem{font-size:30px;margin-bottom:2px}
+      .card h1{font-size:clamp(14px,4vw,20px)!important}
+      [data-theme="classic"] .card h1{font-size:clamp(17px,5vw,26px)!important}
+      .card .sub{font-size:clamp(9px,2.4vw,12px);margin-bottom:14px}
+      .br{gap:8px;min-height:38px;flex-direction:row}
+      .btn{padding:9px 18px;font-size:12px}
+      .by{font-size:12px!important}
+      [data-theme="arcade"] .btn{font-size:7px;padding:8px 12px}
+      .tip{font-size:10px;padding:6px 10px;max-width:90vw}
+      [data-theme="arcade"] .tip{font-size:6px}
+      .fm{font-size:clamp(14px,4vw,24px)!important}
+      .fs{font-size:clamp(10px,2.4vw,13px)!important}
+      #hBox{width:120px;height:120px}
+      .plab{font-size:8px}
+      .ptr{width:110px}
+    }
+
+    /* ─── SPARKLE TRAIL ─────────────────────────────────── */
+    .sparkle{
+      position:fixed;pointer-events:none;z-index:999;
+      width:6px;height:6px;border-radius:50%;
+      background:var(--heart);
+    }
+
+    /* ─── CLASSIC HEARTBEAT on card ─────────────────────── */
+    [data-theme="classic"] .cem{animation:heartbeat 1.2s ease-in-out infinite}
+    @keyframes heartbeat{
+      0%,100%{transform:scale(1)}
+      14%{transform:scale(1.15)}
+      28%{transform:scale(1)}
+      42%{transform:scale(1.08)}
+      56%{transform:scale(1)}
+    }
+  </style>
+</head>
+
+<body data-theme="classic">
+
+<canvas id="bgCanvas"></canvas>
+<canvas id="spotCanvas"></canvas>
+<div id="htDiv"></div>
+
+<!-- Theme Bar -->
+<div class="tbar" id="tbar">
+  <button class="tp on" data-t="classic">💕 Classic</button>
+  <button class="tp" data-t="terminal">💻 Terminal</button>
+  <button class="tp" data-t="cinematic">🎬 Cinematic</button>
+  <button class="tp" data-t="arcade">👾 Arcade</button>
+</div>
+
+<!-- Card -->
+<div class="card" id="card">
+  <div class="cem" id="em">💘</div>
+  <h1 id="hd">Will you be my Valentine?</h1>
+  <p class="sub" id="sb">Choose wisely… today is the day 💕</p>
+  <div class="br" id="brow">
+    <button class="btn by" id="yb">Yes! 💖</button>
+    <button class="btn bn" id="nb">No 😤</button>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="prog" id="prog">
+  <div class="plab" id="plab">Evasion attempts: 0/8</div>
+  <div class="ptr"><div class="pfl" id="pfl"></div></div>
+</div>
+
+<!-- Final -->
+<div class="fin" id="fin">
+  <div id="hBox"></div>
+  <div class="fm" id="fmsg"></div>
+  <div class="fs" id="fsub"></div>
+  <div class="fst" id="fst"></div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+/* ── Data injected by build ─────────────────────────────── */
+const D=window.__V__||{};
+const MSGS=D.msgs||{};
+const YRES=D.yes||{};
+
+/* ── DOM ────────────────────────────────────────────────── */
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const body=document.body,bgC=$("#bgCanvas"),spC=$("#spotCanvas");
+const card=$("#card"),em=$("#em"),hd=$("#hd"),sb=$("#sb");
+const yb=$("#yb"),nb=$("#nb"),brow=$("#brow");
+const tbar=$("#tbar"),plab=$("#plab"),pfl=$("#pfl"),prog=$("#prog");
+const fin=$("#fin"),htDiv=$("#htDiv");
+
+/* ── State ──────────────────────────────────────────────── */
+let theme="classic",totalAtt=0,modeAtt=0,noSc=1,evading=false,done=false,tipEl=null;
+let mx=innerWidth/2,my=innerHeight/2;
+let lastEvadeTime=0;
+const EVADE_COOLDOWN=400; /* ms between evades */
+const T0=Date.now();
+const MODE_MAX=8;     /* evasion attempts per mode before No→Yes */
+const PROX=80;        /* proximity trigger radius */
+
+/* ═══════════════════════════════════════════════════════════
+   CURSOR SPARKLE TRAIL
+   ═══════════════════════════════════════════════════════════ */
+let spkT=0;
+document.addEventListener("mousemove",e=>{
+  if(Date.now()-spkT<50)return; spkT=Date.now();
+  const s=document.createElement("div");s.className="sparkle";
+  s.style.left=e.clientX+"px";s.style.top=e.clientY+"px";
+  document.body.appendChild(s);
+  gsap.to(s,{opacity:0,scale:3,duration:.6,ease:"power2.out",onComplete:()=>s.remove()});
+});
+
+/* ═══════════════════════════════════════════════════════════
+   BACKGROUND PARTICLES
+   ═══════════════════════════════════════════════════════════ */
+const Part=(()=>{
+  const ctx=bgC.getContext("2d");
+  let pts=[];
+  const S={
+    classic:{sh:["❤️","💕","💖","💗","💘","💝","🩷","✦","♡"],fn:"serif"},
+    terminal:{sh:["0","1","{","}","<",">","/","*","_","$","#"],fn:"'Fira Code',monospace"},
+    cinematic:{sh:["✦","⋆","✧","◦","·","✶","✴","˚"],fn:"serif"},
+    arcade:{sh:["★","●","▲","◆","⚡","♦","✦","■","▶"],fn:"'Press Start 2P',monospace"},
+  };
+  const C={
+    classic:["#e91e63","#f06292","#f48fb1","#ff80ab","#ec407a"],
+    terminal:["#00ff41","#00cc33","#33ff66","#00aa22"],
+    cinematic:["#ce93d8","#ab47bc","#e1bee7","#ea80fc","#7c4dff"],
+    arcade:["#ffeb3b","#76ff03","#ff1744","#2979ff","#e040fb"],
+  };
+  const col=()=>{const c=C[theme]||C.classic;return c[~~(Math.random()*c.length)]};
+  const set=()=>S[theme]||S.classic;
+
+  function mk(){
+    const s=set();
+    pts=Array.from({length:50},()=>({
+      x:Math.random()*innerWidth,
+      y:Math.random()*innerHeight*2,
+      vy:-(0.15+Math.random()*.55),
+      vx:(Math.random()-.5)*.3,
+      sz:10+Math.random()*22,
+      op:.08+Math.random()*.3,
+      rot:Math.random()*360,
+      rv:(Math.random()-.5)*1.2,
+      sh:s.sh[~~(Math.random()*s.sh.length)],
+      col:col(),
+    }));
+  }
+  function rsz(){bgC.width=innerWidth;bgC.height=innerHeight}
+  function lp(){
+    ctx.clearRect(0,0,bgC.width,bgC.height);
+    const s=set();
+    for(const p of pts){
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;
+      if(p.y<-60){p.y=innerHeight+60;p.x=Math.random()*innerWidth;p.sh=s.sh[~~(Math.random()*s.sh.length)];p.col=col()}
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.globalAlpha=p.op;ctx.font=`${p.sz}px ${s.fn}`;ctx.fillStyle=p.col;ctx.textAlign="center";
+      ctx.fillText(p.sh,0,0);ctx.restore();
+    }
+    requestAnimationFrame(lp);
+  }
+  function init(){rsz();mk();lp()}
+  addEventListener("resize",rsz);
+  return{init,refresh:mk};
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   CINEMATIC SPOTLIGHT
+   ═══════════════════════════════════════════════════════════ */
+const Spot=(()=>{
+  const ctx=spC.getContext("2d");
+  const lines=[
+    "You are my sunshine ☀️","Forever & Always 💕","My heart beats for you",
+    "Be mine tonight ✨","You complete me 🌹","Together is my favorite place",
+    "Love you to the moon 🌙","Soulmates forever","My heart is yours 💝",
+    "Written in the stars ⭐","Our story begins here","Every moment with you…",
+    "You had me at hello 💜","Two hearts, one soul","Endlessly yours ✨",
+  ];
+  function mkTx(){
+    htDiv.innerHTML="";
+    lines.forEach(t=>{
+      const el=document.createElement("div");el.className="ht";el.textContent=t;
+      el.style.left=(3+Math.random()*84)+"%";
+      el.style.top=(3+Math.random()*84)+"%";
+      el.style.transform=`rotate(${-20+Math.random()*40}deg)`;
+      el.style.fontSize=`${Math.max(12,Math.random()*22)}px`;
+      htDiv.appendChild(el);
+    });
+  }
+  function rsz(){spC.width=innerWidth;spC.height=innerHeight}
+  let sx=innerWidth/2,sy=innerHeight/2;
+  function lp(){
+    if(theme!=="cinematic"){requestAnimationFrame(lp);return}
+    rsz();
+    sx+=(mx-sx)*.08;sy+=(my-sy)*.08;
+    ctx.fillStyle="rgba(6,6,16,0.95)";ctx.fillRect(0,0,spC.width,spC.height);
+    const r=140;
+    const g=ctx.createRadialGradient(sx,sy,0,sx,sy,r);
+    g.addColorStop(0,"rgba(0,0,0,1)");g.addColorStop(.5,"rgba(0,0,0,.7)");g.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.globalCompositeOperation="destination-out";
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.fill();
+    const g2=ctx.createRadialGradient(sx,sy,r-20,sx,sy,r+40);
+    g2.addColorStop(0,"rgba(0,0,0,.3)");g2.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.fillStyle=g2;ctx.beginPath();ctx.arc(sx,sy,r+40,0,Math.PI*2);ctx.fill();
+    ctx.globalCompositeOperation="source-over";
+    ctx.globalAlpha=.08;
+    const g3=ctx.createRadialGradient(sx,sy,0,sx,sy,r*1.2);
+    g3.addColorStop(0,"#ce93d8");g3.addColorStop(1,"transparent");
+    ctx.fillStyle=g3;ctx.beginPath();ctx.arc(sx,sy,r*1.2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+    $$(".ht").forEach(el=>{
+      const rc=el.getBoundingClientRect();
+      const d=Math.hypot(rc.left+rc.width/2-sx,rc.top+rc.height/2-sy);
+      const o=d<r+90?Math.max(0,1-d/(r+90)):0;
+      el.style.color=`rgba(210,190,255,${o*.9})`;
+      el.style.textShadow=o>.3?`0 0 ${o*12}px rgba(200,160,255,${o*.5})`:"none";
+    });
+    requestAnimationFrame(lp);
+  }
+  function init(){rsz();lp()}
+  addEventListener("resize",rsz);
+  return{init,on:mkTx,off(){htDiv.innerHTML=""}};
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   THEMES
+   ═══════════════════════════════════════════════════════════ */
+const copy={
+  classic:  {e:"💘",h:"Will you be my Valentine?",s:"Choose wisely… today is the day 💕",y:"Yes! 💖",n:"No 😤"},
+  terminal: {e:"💚",h:"will_you_be_my_valentine?",s:"run --choose-wisely --no-escape",y:"Yes",n:"No"},
+  cinematic:{e:"✨",h:"Will You Be My Valentine?",s:"The spotlight reveals only truth…",y:"Yes! 💜",n:"No 😤"},
+  arcade:   {e:"👾",h:"PLAYER 2 — BE MY VALENTINE?",s:"INSERT COIN ▶ PRESS YES TO CONTINUE",y:"▶ YES",n:"✕ NO"},
+};
+
+function resetNoButton(){
+  nb.classList.remove("ev");
+  nb.style.cssText="";
+  noSc=1;evading=false;
+  gsap.set(nb,{scale:1,rotation:0,clearProps:"left,top,position,x,y"});
+  nb.removeEventListener("mouseenter",onNoEnter);
+  nb.removeEventListener("touchstart",onNoTouch);
+  nb.onclick=null;
+  /* Re-attach evasion listeners */
+  nb.addEventListener("mouseenter",onNoEnter);
+  nb.addEventListener("touchstart",onNoTouch,{passive:false});
+  nb.addEventListener("click",onNoClick);
+}
+
+function setTheme(t){
+  theme=t;
+  body.setAttribute("data-theme",t);
+  $$(".tp").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
+  const c=copy[t];
+  em.textContent=c.e;hd.textContent=c.h;sb.textContent=c.s;
+  yb.textContent=c.y;
+
+  /* Always reset the No button on mode change (fresh 8 attempts) */
+  done=false; modeAtt=0;
+  nb.textContent=c.n;
+  resetNoButton();
+  updateProg();
+  gsap.set(yb,{scale:1});
+
+  Part.refresh();
+  if(t==="cinematic") Spot.on(); else Spot.off();
+
+  /* Classic mode entrance animation on card */
+  if(t==="classic"){
+    gsap.fromTo(card,{scale:.92,opacity:.6},{scale:1,opacity:1,duration:.7,ease:"elastic.out(1,0.5)"});
+    gsap.fromTo(em,{scale:0,rotation:-30},{scale:1,rotation:0,duration:.8,ease:"elastic.out(1,0.4)",delay:.1});
+  }
+}
+
+$$(".tp").forEach(b=>b.addEventListener("click",()=>setTheme(b.dataset.t)));
+
+/* ═══════════════════════════════════════════════════════════
+   EVASION ENGINE — No button ESCAPES for MODE_MAX attempts,
+   then converts to Yes. Per-mode counter resets on theme
+   change but totalAtt carries across.
+   ═══════════════════════════════════════════════════════════ */
+function pool(){
+  if(modeAtt<=3) return "mild";
+  if(modeAtt<=5) return "medium";
+  if(modeAtt<=7) return "spicy";
+  return "final";
+}
+
+function pickMsg(){
+  const th=MSGS[theme]||MSGS.classic||{};
+  const p=th[pool()]||th.mild||["Nice try!"];
+  let m=p[~~(Math.random()*p.length)]||"Nice try!";
+  return m.replace(/\{attempts\}/g,totalAtt);
+}
+
+function growYes(){
+  const s=1+Math.min(totalAtt,30)*.03;
+  gsap.to(yb,{scale:s,duration:.4,ease:"elastic.out(1,0.6)"});
+}
+
+/* ─── Teleport the No button away ───────────────────────── */
+function teleport(cx,cy){
+  if(!evading){
+    const r=nb.getBoundingClientRect();
+    nb.classList.add("ev");
+    nb.style.left=r.left+"px";nb.style.top=r.top+"px";
+    evading=true;
+  }
+  const pad=20,r=nb.getBoundingClientRect(),w=r.width,h=r.height;
+  const yr=yb.getBoundingClientRect();
+  let nx,ny,tries=0;
+  do{
+    nx=pad+Math.random()*(innerWidth-w-pad*2);
+    ny=pad+55+Math.random()*(innerHeight-h-pad*2-70);
+    tries++;
+  }while(tries<80&&(
+    Math.hypot(nx+w/2-cx,ny+h/2-cy)<PROX*2.5||
+    !(nx+w+20<yr.left||nx-20>yr.right||ny+h+20<yr.top||ny-20>yr.bottom)
+  ));
+
+  const eases=["power3.out","back.out(1.4)","elastic.out(1,0.5)","expo.out","circ.out"];
+  gsap.to(nb,{left:nx,top:ny,duration:.18+Math.random()*.15,ease:eases[~~(Math.random()*eases.length)]});
+  gsap.to(nb,{rotation:(Math.random()-.5)*25,duration:.1,yoyo:true,repeat:1});
+  gsap.fromTo(nb,{scale:noSc*1.12},{scale:noSc,duration:.22,ease:"elastic.out(1,0.5)"});
+}
+
+/* ─── Shrink No progressively ───────────────────────────── */
+function shrinkNo(){
+  noSc=Math.max(.4,1-(modeAtt/MODE_MAX)*.6);
+  gsap.to(nb,{scale:noSc,duration:.3,ease:"power2.out"});
+}
+
+/* ─── Tooltip ───────────────────────────────────────────── */
+function showTip(msg){
+  if(tipEl){gsap.killTweensOf(tipEl);tipEl.remove()}
+  const el=document.createElement("div");el.className="tip";el.textContent=msg;
+  document.body.appendChild(el);tipEl=el;
+  const br=nb.getBoundingClientRect(),tw=el.offsetWidth;
+  let tx=br.left+br.width/2-tw/2,ty=br.top-52;
+  tx=Math.max(6,Math.min(tx,innerWidth-tw-6));
+  ty=Math.max(6,ty);
+  el.style.left=tx+"px";el.style.top=ty+"px";
+  gsap.fromTo(el,{opacity:0,y:14,scale:.9},{opacity:1,y:0,scale:1,duration:.35,ease:"back.out(2)"});
+  gsap.to(el,{opacity:0,y:-24,duration:.3,delay:2.2,onComplete:()=>el.remove()});
+}
+
+/* ─── Convert No → Yes ──────────────────────────────────── */
+function convertNo(){
+  const r=nb.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const shapes={classic:"❤️",terminal:"1",cinematic:"✨",arcade:"★"};
+  for(let i=0;i<28;i++){
+    const p=document.createElement("div");
+    const sz=5+Math.random()*8;
+    p.style.cssText=`position:fixed;z-index:60;pointer-events:none;left:${cx}px;top:${cy}px;font-size:${sz+8}px;`;
+    p.textContent=shapes[theme]||"❤️";
+    document.body.appendChild(p);
+    const a=(Math.PI*2/28)*i,d=40+Math.random()*120;
+    gsap.to(p,{x:Math.cos(a)*d,y:Math.sin(a)*d,opacity:0,scale:0,rotation:Math.random()*360,duration:.6+Math.random()*.4,ease:"power2.out",onComplete:()=>p.remove()});
+  }
+  const c=copy[theme];
+  nb.removeEventListener("mouseenter",onNoEnter);
+  nb.removeEventListener("touchstart",onNoTouch);
+  nb.onclick=handleYes;
+  done=true;
+  gsap.to(nb,{
+    scale:1.2,duration:.5,ease:"elastic.out(1,0.4)",
+    onStart(){
+      nb.style.background="var(--ybg)";nb.style.color="#fff";
+      nb.style.boxShadow="0 4px 24px var(--ygl)";
+      nb.textContent=c.y;nb.style.border="none";
+    }
+  });
+}
+
+/* ─── Progress ──────────────────────────────────────────── */
+function updateProg(){
+  const pct=Math.min(100,(modeAtt/MODE_MAX)*100);
+  pfl.style.width=pct+"%";
+  const labels={
+    terminal:`evasion_attempts = ${modeAtt}/${MODE_MAX}`,
+    arcade:`SCORE: ${modeAtt}/${MODE_MAX} | LIVES: ${MODE_MAX-modeAtt}`,
+  };
+  plab.textContent=labels[theme]||`Evasion attempts: ${modeAtt}/${MODE_MAX}`;
+}
+
+/* ─── Core evade call ───────────────────────────────────── */
+function evade(cx,cy){
+  if(done)return;
+  const now=Date.now();
+  if(now-lastEvadeTime<EVADE_COOLDOWN)return;
+  lastEvadeTime=now;
+
+  totalAtt++;modeAtt++;
+  updateProg();growYes();
+
+  /* Teleport + show message on every attempt */
+  teleport(cx,cy);
+  showTip(pickMsg());
+
+  /* Shrink from halfway */
+  if(modeAtt>=MODE_MAX/2) shrinkNo();
+
+  /* Convert on the 8th attempt (after showing final message) */
+  if(modeAtt>=MODE_MAX){
+    setTimeout(()=>convertNo(),500);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3-D HEART (Three.js)
+   ═══════════════════════════════════════════════════════════ */
+function mk3D(ct){
+  const W=200,H=200;
+  const sc=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(40,W/H,.1,100);cam.position.z=6;
+  const ren=new THREE.WebGLRenderer({alpha:true,antialias:true});
+  ren.setSize(W,H);ren.setPixelRatio(Math.min(devicePixelRatio,2));
+  ct.appendChild(ren.domElement);
+
+  const x=0,y=0;
+  const s=new THREE.Shape();
+  s.moveTo(x,y+.7);
+  s.bezierCurveTo(x,y+.7,x-.05,y+1.2,x-.4,y+1.2);
+  s.bezierCurveTo(x-1.1,y+1.2,x-1.1,y+.45,x-1.1,y+.45);
+  s.bezierCurveTo(x-1.1,y-.05,x-.65,y-.55,x,y-1.1);
+  s.bezierCurveTo(x+.65,y-.55,x+1.1,y-.05,x+1.1,y+.45);
+  s.bezierCurveTo(x+1.1,y+.45,x+1.1,y+1.2,x+.4,y+1.2);
+  s.bezierCurveTo(x+.05,y+1.2,x,y+.7,x,y+.7);
+
+  const geo=new THREE.ExtrudeGeometry(s,{depth:.35,bevelEnabled:true,bevelThickness:.12,bevelSize:.08,bevelSegments:8});
+  geo.center();
+  const hc={classic:"#e91e63",terminal:"#00ff41",cinematic:"#ce93d8",arcade:"#ff1744"};
+  const mat=new THREE.MeshPhongMaterial({color:hc[theme]||"#e91e63",shininess:120,specular:0x666666});
+  const mesh=new THREE.Mesh(geo,mat);sc.add(mesh);
+  const l1=new THREE.DirectionalLight(0xffffff,1);l1.position.set(2,3,4);sc.add(l1);
+  const l2=new THREE.DirectionalLight(0xffffff,.3);l2.position.set(-2,-1,2);sc.add(l2);
+  sc.add(new THREE.AmbientLight(0xffffff,.4));
+  (function a(){
+    requestAnimationFrame(a);
+    mesh.rotation.y+=.015;
+    const sc2=1+Math.sin(Date.now()*.003)*.1;
+    mesh.scale.set(sc2,sc2,sc2);
+    ren.render(sc,cam);
+  })();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   YES — celebration
+   ═══════════════════════════════════════════════════════════ */
+function handleYes(){
+  if(done&&nb.onclick!==handleYes)return;
+  done=true;
+
+  const cs=getComputedStyle(body).getPropertyValue("--conf").split(",").map(s=>s.trim());
+  const end=Date.now()+5500;
+  (function fr(){
+    confetti({particleCount:5,angle:60,spread:85,origin:{x:0,y:.7},colors:cs,gravity:.65});
+    confetti({particleCount:5,angle:120,spread:85,origin:{x:1,y:.7},colors:cs,gravity:.65});
+    if(Date.now()<end) requestAnimationFrame(fr);
+  })();
+  confetti({particleCount:250,spread:140,origin:{y:.5},colors:cs,gravity:.5,scalar:1.3,drift:.5});
+  setTimeout(()=>confetti({particleCount:80,angle:90,spread:60,origin:{x:.5,y:.3},colors:cs,gravity:.6}),800);
+  setTimeout(()=>confetti({particleCount:100,angle:270,spread:100,origin:{x:.5,y:1},colors:cs,gravity:-.3,startVelocity:30}),1200);
+
+  const tl=gsap.timeline();
+  tl.to([card,prog,tbar],{opacity:0,scale:.8,y:-30,duration:.55,stagger:.08,ease:"power2.in"});
+  tl.to(".tip",{opacity:0,duration:.12},"<");
+  if(evading) tl.to(nb,{opacity:0,duration:.2},"<");
+
+  tl.add(()=>{
+    fin.classList.add("show");
+    const elapsed=((Date.now()-T0)/1000).toFixed(1);
+    const pl=YRES[theme]||YRES.classic||["I knew you'd say yes! 🥰"];
+    const msg=pl[~~(Math.random()*pl.length)];
+    const subs={
+      terminal:'$ echo "Happy Valentine\'s Day" | love --forever',
+      arcade:"🏆 GAME OVER — YOU WIN LOVE 🏆",
+      cinematic:"The greatest love story ever told… ✨",
+    };
+    $("#fmsg").textContent=msg;
+    $("#fsub").textContent=subs[theme]||"Happy Valentine's Day, my love 💕";
+    $("#fst").textContent=`💌 ${totalAtt} evasion attempt${totalAtt!==1?"s":""} in ${elapsed}s`;
+    mk3D($("#hBox"));
+    gsap.fromTo(fin,{opacity:0},{opacity:1,duration:.8,ease:"power2.out"});
+    gsap.fromTo("#hBox",{scale:0,rotation:-180},{scale:1,rotation:0,duration:1.3,ease:"elastic.out(1,0.5)",delay:.2});
+    gsap.fromTo("#fmsg",{opacity:0,y:30},{opacity:1,y:0,duration:.7,delay:.7});
+    gsap.fromTo("#fsub",{opacity:0,y:20},{opacity:.85,y:0,duration:.7,delay:1});
+    gsap.fromTo("#fst",{opacity:0,y:15},{opacity:.7,y:0,duration:.6,delay:1.3});
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EVENT HANDLERS
+   ═══════════════════════════════════════════════════════════ */
+document.addEventListener("mousemove",e=>{mx=e.clientX;my=e.clientY;proxCheck(e.clientX,e.clientY)});
+document.addEventListener("touchmove",e=>{const t=e.touches[0];mx=t.clientX;my=t.clientY;proxCheck(t.clientX,t.clientY)},{passive:true});
+
+function onNoEnter(e){evade(e.clientX,e.clientY)}
+function onNoTouch(e){e.preventDefault();const t=e.touches[0];evade(t.clientX,t.clientY)}
+function onNoClick(e){e.preventDefault();evade(mx,my)}
+
+nb.addEventListener("mouseenter",onNoEnter);
+nb.addEventListener("touchstart",onNoTouch,{passive:false});
+nb.addEventListener("click",onNoClick);
+yb.addEventListener("click",handleYes);
+
+/* Proximity check — if cursor gets close, button runs */
+function proxCheck(cx,cy){
+  if(done)return;
+  const r=nb.getBoundingClientRect();
+  const bx=r.left+r.width/2,by=r.top+r.height/2;
+  if(Math.hypot(cx-bx,cy-by)<PROX+Math.max(r.width,r.height)/2) evade(cx,cy);
+}
+
+/* Keep button in viewport on resize */
+addEventListener("resize",()=>{
+  if(!evading)return;
+  const r=nb.getBoundingClientRect();
+  if(r.left>innerWidth-r.width-10) nb.style.left=(innerWidth-r.width-10)+"px";
+  if(r.top>innerHeight-r.height-10) nb.style.top=(innerHeight-r.height-10)+"px";
+});
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+Part.init();Spot.init();setTheme("classic");
+
+/* Classic opener: staggered entrance */
+gsap.fromTo(card,{opacity:0,y:60,scale:.85},{opacity:1,y:0,scale:1,duration:1.2,ease:"elastic.out(1,0.6)",delay:.15});
+gsap.fromTo(em,{scale:0,rotation:-45},{scale:1,rotation:0,duration:1,ease:"elastic.out(1,0.4)",delay:.35});
+gsap.fromTo(hd,{opacity:0,y:20},{opacity:1,y:0,duration:.8,delay:.55,ease:"power2.out"});
+gsap.fromTo(sb,{opacity:0,y:15},{opacity:1,y:0,duration:.7,delay:.7,ease:"power2.out"});
+gsap.fromTo(yb,{opacity:0,scale:0,rotation:-20},{opacity:1,scale:1,rotation:0,duration:.8,delay:.9,ease:"elastic.out(1,0.5)"});
+gsap.fromTo(nb,{opacity:0,scale:0,rotation:20},{opacity:1,scale:1,rotation:0,duration:.8,delay:1,ease:"elastic.out(1,0.5)"});
+gsap.fromTo(prog,{opacity:0,y:20},{opacity:1,y:0,duration:.5,delay:1.2});
+gsap.fromTo(tbar,{opacity:0,y:-24},{opacity:1,y:0,duration:.5,delay:.3,ease:"power2.out"});
+
+})();
+</script>
+</body>
+</html>

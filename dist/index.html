@@ -68,13 +68,14 @@
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
     html,body{
-      width:100%;height:100%;overflow:hidden;
+      width:100%;min-height:100%;min-height:100dvh;overflow:hidden;
       font-family:var(--font);
       background:var(--bg);color:var(--tx);
       transition:background .8s,color .4s,font-family 0s;
       -webkit-tap-highlight-color:transparent;
+      -webkit-text-size-adjust:100%;
     }
-    body{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+    body{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:50px 10px 40px}
 
     /* ─── CUSTOM CURSORS PER THEME ──────────────────────── */
     /* Classic: heart cursor */
@@ -353,6 +354,25 @@
       .ptr{width:110px}
     }
 
+    /* ─── SHORT SCREENS / LANDSCAPE MOBILE ──────────────── */
+    @media(max-height:500px){
+      body{padding:36px 10px 30px}
+      .tbar{top:4px}
+      .card{padding:14px 12px 12px}
+      .cem{font-size:26px;margin-bottom:2px}
+      .card h1{font-size:clamp(13px,3.5vw,18px)!important}
+      [data-theme="classic"] .card h1{font-size:clamp(15px,4vw,22px)!important}
+      .card .sub{font-size:clamp(9px,2vw,11px);margin-bottom:10px}
+      .br{min-height:34px;gap:8px}
+      .btn{padding:8px 16px;font-size:12px}
+      [data-theme="arcade"] .btn{font-size:7px;padding:6px 10px}
+      .prog{bottom:4px}
+      .plab{font-size:8px}
+      #hBox{width:100px;height:100px}
+      .fm{font-size:clamp(13px,3.5vw,22px)!important}
+      .fs{font-size:clamp(9px,2vw,12px)!important}
+    }
+
     /* ─── SPARKLE TRAIL ─────────────────────────────────── */
     .sparkle{
       position:fixed;pointer-events:none;z-index:999;
@@ -371,7 +391,7 @@
     }
   </style>
 
-    <!-- Injected by build.py @ 18:56:11 -->
+    <!-- Injected by build.py @ 19:08:27 -->
     <script>
     window.__V__ = {
       msgs: {"classic": {"mild": ["Haha, nice try 😏", "You missed! Try again~", "Oops! The button is shy 🙈", "Almost got it!", "So close, yet so far 💨", "The button said: 'Not today!'", "Nope! Better luck next time 🍀", "Woah there, speedy fingers!", "The button believes in you… to click Yes 💕", "Cupid would be disappointed 💘"], "medium": ["My heart's not accepting 'No' right now 💔", "Even roses have thorns, but they still say yes 🌹", "Love isn't supposed to be this difficult 😭", "The universe ships us. Just accept it ✨", "Are you seriously trying to say no? SERIOUSLY?", "This button has better reflexes than your excuses 😏", "Every second you chase = more love proven 💕", "Plot twist: the button is rooting for Yes", "My heart rate just spiked watching you try 💓"], "spicy": ["OK this is getting ridiculous. Just say YES 😤", "The stars aligned for us. Don't fight astronomy ✨", "Fun fact: 100% of people who clicked Yes are happier", "Your persistence is cute. But futile 💕", "I asked the magic 8-ball. It said 'Yes' 🎱", "Breaking news: Button remains uncatchable 📰", "You vs. this button: 0 – {attempts} 💀", "At this point, clicking Yes IS the power move 💪"], "final": ["The button gives up. Only because it loves you 💕", "Resistance was futile. Love wins. Always 🏆", "The 'No' era is over. Welcome to the 'Yes' era 💖"]}, "terminal": {"mild": ["$ ./reject.sh: Permission denied", "Error: ECONNREFUSED – 'No' server unreachable", "WARNING: Button has root privileges", "Segfault (core dumped at your feelings)", "$ catch button → PID not found", "bash: no: command not found", "Process 'rejection' killed by signal SIGLOV", "Retry attempt {attempts}/25… still failing"], "medium": ["git push --force won't work on feelings", "sudo please-be-my-valentine → denied", "npm ERR! 404 'no-to-valentine' not in registry", "SELECT * FROM hearts WHERE answer='no' → 0 rows", "TypeError: Cannot read property 'no' of undefined", "docker run rejection:latest → exited (code 1)", "curl -X POST /api/reject → 403 Forbidden", "Compiling love.exe ████████░░ stuck", "Stack overflow: recursive rejection attempts", "Merge conflict in heart.js – resolve manually"], "spicy": ["CRITICAL: Rejection microservice permanently offline", "rm -rf /feelings → Operation not permitted", "The button deployed to prod. No rollback.", "Exception: UnrequitedLoveError – retrying in 0ms…", "Your cursor latency: {attempts}ms behind this button", "CI/CD pipeline only deploys 'Yes' builds 🚀", "Even o3 model says click Yes", "kubectl delete pod rejection-0 → restarting as 'yes'", "This button's uptime: 99.999%. Your catch rate: 0%"], "final": ["OVERRIDE: Converting 'No' → 'Yes' 💚", "Process 'no' terminated. Spawning 'yes'…", "git commit -m 'finally said yes'", "Build succeeded ✓ Deploying love v1.0"]}, "cinematic": {"mild": ["The spotlight follows… but so does love ✨", "In every great film, the answer is yes 🎬", "Act I: The Chase begins…", "The audience is watching 🍿", "Even in the dark, love finds a way 💜", "Fade in: A button that can't be caught…", "This scene needs a better ending 🎭", "The director whispers: 'Try Yes instead'"], "medium": ["Plot twist incoming… 🎬", "Act II: The hero can't catch the button", "The orchestra swells… will they say yes? 🎵", "Every love story has a turning point ✨", "The spotlight is on YOU. Not the button 💡", "Critics: peak romantic cinema 🌟", "Intermission… but the button won't pause 🍿", "Even Hitchcock couldn't build this suspense 🎭", "Rated 💜 for Unresolved Romantic Tension"], "spicy": ["Act III: The climax approaches… 🎬", "The audience: edge of their seats 😱", "This isn't a tragedy. Don't make it one 💔→💜", "Standing ovation if you click Yes 👏", "Even the villain said yes by now 🎭", "The film reel is running out… choose NOW ⏳", "In the director's cut, Yes was click #1", "Credits about to roll. Happy ending? 🌟"], "final": ["FINAL ACT: Love always wins 💜", "Roll credits on a beautiful love story ✨", "The audience erupts in applause 👏", "And they lived happily ever after… THE END 🎬"]}, "arcade": {"mild": ["MISS! TRY AGAIN ▶", "PLAYER 1 MISSED! -0 LIVES (∞ LEFT)", "DODGE SKILL: ★★★★★", "BUTTON USED TELEPORT! SUPER EFFECTIVE!", "LEVEL {attempts}: BUTTON SPEED++", "INSERT COIN TO RETRY 🪙", "COMBO BREAKER!", "ROUND {attempts}: FIGHT! 🥊"], "medium": ["BOSS BATTLE: EVASIVE NO v2.0 🎮", "POWER-UP NEEDED: CLICK YES ⬆", "ACHIEVEMENT LOCKED: 'Catch The Button'", "DIFFICULTY: ★★★★★★★★★★ IMPOSSIBLE", "NEW HIGH SCORE: {attempts} MISSES! 🏆", "PRO TIP: THE YES BUTTON DOESN'T MOVE 💡", "SECRET ENDING REQUIRES YES INPUT", "STATS → ACCURACY: 0% | HEART: 100%", "BUTTON USED CHEAT CODE: ↑↑↓↓←→←→BA", "RAGE QUIT? OR CLICK YES? 🎮"], "spicy": ["⚠ FINAL BOSS APPROACHING ⚠", "BUTTON IS LVL {attempts}. YOU ARE LVL 1.", "GAME OVER IN 3… 2… UNLESS YOU CLICK YES", "CHEAT: SKIP TO HAPPY ENDING → YES", "BUTTON HP: ∞  |  YOUR PATIENCE: CRITICAL", "EVEN KONAMI CODE CAN'T HELP NOW", "SPEEDRUN WR: YES IN 0.01s. YOUR TIME: ∞", "YES BUTTON GRANTS +999 LOVE XP 💛"], "final": ["🏆 GAME COMPLETE — YES ENDING UNLOCKED 🏆", "FINAL SCORE: {attempts} ATTEMPTS. RANK: SSS 👾", "CONGRATULATIONS! YOU WON LOVE! 💛", "PLAYER 2 HAS JOINED! ❤️‍🔥"]}},
@@ -584,10 +604,12 @@ function resetNoButton(){
   nb.style.cssText="";
   noSc=1;evading=false;
   gsap.set(nb,{scale:1,rotation:0,clearProps:"left,top,position,x,y"});
+  /* Remove all evasion + conversion listeners cleanly */
   nb.removeEventListener("mouseenter",onNoEnter);
   nb.removeEventListener("touchstart",onNoTouch);
+  nb.removeEventListener("click",onNoClick);
   nb.onclick=null;
-  /* Re-attach evasion listeners */
+  /* Re-attach evasion listeners fresh */
   nb.addEventListener("mouseenter",onNoEnter);
   nb.addEventListener("touchstart",onNoTouch,{passive:false});
   nb.addEventListener("click",onNoClick);
@@ -602,7 +624,7 @@ function setTheme(t){
   yb.textContent=c.y;
 
   /* Always reset the No button on mode change (fresh 8 attempts) */
-  done=false; modeAtt=0;
+  done=false; modeAtt=0; lastEvadeTime=0;
   nb.textContent=c.n;
   resetNoButton();
   updateProg();
@@ -692,6 +714,7 @@ function showTip(msg){
 
 /* ─── Convert No → Yes ──────────────────────────────────── */
 function convertNo(){
+  done=true;
   const r=nb.getBoundingClientRect();
   const cx=r.left+r.width/2,cy=r.top+r.height/2;
   const shapes={classic:"❤️",terminal:"1",cinematic:"✨",arcade:"★"};
@@ -707,8 +730,8 @@ function convertNo(){
   const c=copy[theme];
   nb.removeEventListener("mouseenter",onNoEnter);
   nb.removeEventListener("touchstart",onNoTouch);
+  nb.removeEventListener("click",onNoClick);
   nb.onclick=handleYes;
-  done=true;
   gsap.to(nb,{
     scale:1.2,duration:.5,ease:"elastic.out(1,0.4)",
     onStart(){
@@ -885,7 +908,7 @@ gsap.fromTo(tbar,{opacity:0,y:-24},{opacity:1,y:0,duration:.5,delay:.3,ease:"pow
 })();
 </script>
 
-<div style="position:fixed;bottom:2px;right:8px;z-index:999;font-size:10px;opacity:.45;color:var(--tx);font-family:inherit;pointer-events:none;letter-spacing:.3px;">
+<div style="position:fixed;bottom:2px;left:50%;transform:translateX(-50%);z-index:999;font-size:clamp(7px,1.8vw,10px);opacity:.4;color:var(--tx);font-family:inherit;pointer-events:none;letter-spacing:.3px;white-space:nowrap;">
   crafted with ❤️ by Jerome Kingsly
 </div>
 
